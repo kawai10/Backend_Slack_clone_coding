@@ -1,4 +1,15 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from "@nestjs/common";
 
-@Controller('dms')
-export class DmsController {}
+@Controller('api/workspaces/:url/dms')
+export class DmsController {
+  @Get(':id/chats')
+  getChat(@Query() query, @Param() param) {
+    console.log(query.perPage, query.page)
+    console.log(param.id, param.url)
+  }
+
+  @Post(':id/chats')
+  postChat() {
+
+  }
+}
