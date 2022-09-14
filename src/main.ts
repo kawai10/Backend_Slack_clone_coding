@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { HttpExceptionFilter } from "./HttpException.filter";
 
 declare const module: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.useGlobalFilters(new HttpExceptionFilter())
   const config = new DocumentBuilder()
     .setTitle('Slack_clone API')
     .setDescription('The Slack_clone API description')
