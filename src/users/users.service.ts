@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JoinRequestDto } from "./dto/join.request.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../entities/Users";
@@ -18,7 +18,7 @@ export class UsersService {
     const user = await this.usersRepository.findOne({where:{email}})
 
     if (user) {
-      throw new Error('Already Exist User')
+      throw new UnauthorizedException('Already Exist User')
     }
 
     const hashedPassword = await bcrypt.hash(password, 12)
