@@ -1,10 +1,13 @@
-import { Body, Controller, Get, Post, Req, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JoinRequestDto } from "./dto/join.request.dto";
 import { UsersService } from "./users.service";
 import { ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { UserDto } from "../common/dto/user.dto";
 import { User } from "../common/decorator/user.decorator";
 import { UndefinedToNullInterceptor } from "../common/interceptors/undefinedToNull.interceptor";
+import { LocalAuthGuard } from "../auth/local.auth.guard";
+import { LoggedInGuard } from "../auth/logged-in.guard";
+import { NotLoggedInGuard } from "../auth/not-logged-in.guard";
 
 @UseInterceptors(UndefinedToNullInterceptor)
 @ApiTags('User')
@@ -22,6 +25,7 @@ export class UsersController {
     return user
   }
 
+  @UseGuards(new NotLoggedInGuard())
   @ApiOperation({summary:'회원가입'})
   @Post()
   async postUsers(@Body() data:JoinRequestDto) {
@@ -32,12 +36,13 @@ export class UsersController {
   @ApiOkResponse({
     type: UserDto,
   })
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(new LocalAuthGuard())
   @Post('login')
   logIn(@User() user) {
     return user
   }
 
+  @UseGuards(new LoggedInGuard())
   @ApiOperation({summary:'로그아웃'})
   @Post('logout')
   logOut() {
