@@ -1,0 +1,17 @@
+import { Injectable } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
+
+@Injectable()
+export class LocalAuthGuard extends AuthGuard('local') {
+  async canActivate(context): Promise<boolean>{
+    const can = super.canActivate(context)
+
+    if(can) {
+      const request = context.switchToHttp().getRequest()
+      console.log('login for cookie')
+      await super.logIn(request)
+    }
+
+    return true;
+  }
+}

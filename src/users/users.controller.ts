@@ -32,6 +32,7 @@ export class UsersController {
   @ApiOkResponse({
     type: UserDto,
   })
+  @UseGuards(LocalAuthGuard)
   @Post('login')
   logIn(@User() user) {
     return user
