@@ -1,11 +1,20 @@
-import { Controller, Delete, Get, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, ParseIntPipe, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { WorkspacesService } from "./workspaces.service";
 
 @ApiTags('Workspace')
 @Controller('api/workspaces')
 export class WorkspacesController {
+
+  constructor(
+    private workspacesService:WorkspacesService
+  ) {
+  }
+
   @Get()
-  getMyWorkspaces(){}
+  getMyWorkspaces(@Body('myId', ParseIntPipe) myId:number){
+    return this.workspacesService.findMyWorkspaces(myId)
+  }
 
   @Post()
   createWorkspace(){}
