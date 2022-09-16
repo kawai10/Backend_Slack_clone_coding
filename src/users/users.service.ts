@@ -2,8 +2,10 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JoinRequestDto } from "./dto/join.request.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Users } from "../entities/Users";
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import bcrypt from "bcrypt"
+import { WorkspaceMembers } from "../entities/WorkspaceMembers";
+import { ChannelMembers } from "../entities/ChannelMembers";
 
 @Injectable()
 export class UsersService {
@@ -11,6 +13,11 @@ export class UsersService {
   constructor(
     @InjectRepository(Users)
     private usersRepository:Repository<Users>,
+    @InjectRepository(WorkspaceMembers)
+    private workSpaceMembers: Repository<WorkspaceMembers>,
+    @InjectRepository(ChannelMembers)
+    private channelMembers: Repository<ChannelMembers>,
+    private dataSource:DataSource
   ) {}
 
   async postUsers(data: JoinRequestDto) {
@@ -23,10 +30,32 @@ export class UsersService {
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    await this.usersRepository.save({
-      email,
-      nickname,
-      password:hashedPassword
-    })
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      const returned = await queryRunner.manager.getRepository(Users).save({
+        email,
+        nickname,
+        password:hashedPassword
+      })
+
+      await queryRunner.manager.getRepository(WorkspaceMembers).save({
+          UserId: returned.id,
+          WorkspaceId :1
+        }
+      )
+      await queryRunner.manager.getRepository(ChannelMembers).save({
+          UserId: returned.id,
+          ChannelId :1
+        }
+      )
+      await queryRunner.commitTransaction()
+    } catch (err){
+      await queryRunner.rollbackTransaction()
+    } finally {
+      await queryRunner.release()
+    }
+
+    return true
   }
 }
