@@ -34,4 +34,11 @@ export class WorkspacesService {
       }
     })
   }
+
+  async getWorkspaceMembers(url:string){
+    this.usersRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.WorkspaceMembers', 'members')
+      .innerJoin('members.Workspace', 'workspace', 'workspace.url = :url', {url})
+  }
 }
