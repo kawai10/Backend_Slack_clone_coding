@@ -22,7 +22,7 @@ export class UsersController {
   })
   @Get()
   getUsers(@User() user) {
-    return user
+    return this.usersService.findByEmail(user.email)
   }
 
   @UseGuards(new NotLoggedInGuard())
