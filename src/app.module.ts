@@ -10,6 +10,7 @@ import { DmsModule } from './dms/dms.module';
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Users } from "./entities/Users";
 import { AuthModule } from "./auth/auth.module";
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [ConfigModule.forRoot({isGlobal:true}), AuthModule,UsersModule, WorkspacesModule, ChannelsModule, DmsModule,
@@ -27,7 +28,7 @@ import { AuthModule } from "./auth/auth.module";
         synchronize:true,
         logging: true
     }}
-  }), TypeOrmModule.forFeature([Users])],
+  }), TypeOrmModule.forFeature([Users]), EventsModule],
   controllers: [AppController],
   providers: [AppService, ConfigService],
 })
